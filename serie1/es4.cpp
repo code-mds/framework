@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <limits>
 
 using namespace std;
 
@@ -145,7 +146,7 @@ namespace es4 {
 
     }
 
-    void lista() {
+    void print_list() {
         int idx = 1;
         vector<TodoEntry>::iterator it;
         it = entries.begin();
@@ -157,9 +158,9 @@ namespace es4 {
         }
     }
 
-    void modifica() {
+    void modify_list() {
         cout << "======= Elenco elementi =======" << endl;
-        lista();
+        print_list();
         cout << "===============================" << endl;
 
         cout << "Quale elemento vuoi modificare? (0 per annullare)" << flush;
@@ -186,10 +187,10 @@ namespace es4 {
                     rimuovi();
                     break;
                 case 'L':
-                    lista();
+                    print_list();
                     break;
                 case 'M':
-                    modifica();
+                    modify_list();
                     break;
             }
 
