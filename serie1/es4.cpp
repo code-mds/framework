@@ -7,37 +7,15 @@ using namespace std;
 
 namespace es4 {
     const int VERSION = 1;
-    const char DELIMITER = '|';
     const string DB_NAME = "Todo.dat";
 
-    enum class importanza { BASSA, MEDIA, ALTA, FATTO };
-
-    struct TodoHeader {
-        int version;
-        int num_entries;
-    };
+    enum class importanza { BASSA=1, MEDIA, ALTA, FATTO };
 
     struct TodoEntry {
         string titolo;
         string descrizione;
         importanza importanza;
     };
-
-    std::ostream& operator << (std::ostream& stream, const TodoHeader header)
-    {
-        return stream   << header.version << DELIMITER
-                        << header.num_entries << endl;
-    }
-
-    std::istream& operator >> (std::istream& stream, TodoHeader& header)
-    {
-        string strValue;
-        getline(stream, strValue, DELIMITER);
-        header.version = stoi(strValue);
-        getline(stream, strValue, DELIMITER);
-        header.num_entries = stoi(strValue);
-        return stream;
-    }
 
     std::ostream& operator << (std::ostream& stream, const importanza val)
     {
@@ -61,15 +39,17 @@ namespace es4 {
 
     std::ostream& operator << (std::ostream& stream, const TodoEntry entry)
     {
-        return stream   << entry.titolo << DELIMITER
-                        << entry.descrizione << DELIMITER
+        return stream   << entry.titolo << endl
+                        << entry.descrizione << endl
                         << entry.importanza << endl;
     }
 
     std::istream& operator >> (std::istream& stream, TodoEntry& entry)
     {
-        getline(stream, entry.titolo, DELIMITER);
-        getline(stream, entry.descrizione, DELIMITER);
+        getline(stream, entry.titolo);
+        getline(stream, entry.descrizione);
+        string strImportanza;
+        getline(stream, strImportanza);
         int iImp;
         if(stream >> iImp)
             entry.importanza = importanza(iImp);
@@ -78,19 +58,16 @@ namespace es4 {
     }
 
 
-    TodoHeader header;
     vector<TodoEntry> entries;
 
     void init_db() {
         ifstream inputFile(DB_NAME);
         if(inputFile.good()) {
-            inputFile >> header;
             TodoEntry entry;
 
             vector<TodoEntry>::iterator it;
             it = entries.begin();
             while(inputFile >> entry) {
-                header.num_entries++;
                 it = entries.insert(it, entry);
             }
         }
@@ -99,7 +76,6 @@ namespace es4 {
 
     void flush_db() {
         ofstream outputFile(DB_NAME);
-        outputFile << header;
 
         vector<TodoEntry>::iterator it;
         it = entries.begin();
@@ -155,6 +131,7 @@ namespace es4 {
                  << (*it).titolo << ","
                  << (*it).descrizione << ","
                  << (*it).importanza << endl;
+            idx++;
         }
     }
 
