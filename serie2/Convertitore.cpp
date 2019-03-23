@@ -7,15 +7,17 @@
 #include "Convertitore.h"
 using namespace std;
 
+std::ostream & operator << (std::ostream &out, const Convertitore &conv) {
+    out << conv.m_labelFrom << "\t" << conv.m_labelTo << endl;
+    out << conv.m_rate << "\t" << 1 << endl;
+    return out;
+}
+
+
 Convertitore::Convertitore(string labelFrom, string labelTo, double rate) :
     m_labelFrom{labelFrom}, m_labelTo{labelTo}, m_rate{rate}
 {
 
-}
-
-void Convertitore::displayInfo(void) {
-    cout << m_labelFrom << "\t" << m_labelTo << endl;
-    cout << m_rate << "\t" << 1 << endl;
 }
 
 double Convertitore::convert(double from) {
@@ -46,4 +48,12 @@ void Convertitore::convertFromFile(string fileName) {
         cout << i << ")" << convert(val) << endl;
         i++;
     }
+}
+
+double Convertitore::operator<<(const double input) {
+    return convert(input);
+}
+
+double Convertitore::operator>>(const double input) {
+    return iconvert(input);
 }

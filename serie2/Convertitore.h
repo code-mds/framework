@@ -16,7 +16,11 @@ private:
 
 public:
     Convertitore(string labelFrom, string labelTo, double rate = 1.2);
-    void displayInfo(void);
+
+    friend std::ostream & operator << (std::ostream &stream, const Convertitore &conv);
+    double operator << (const double input);
+    double operator >> (const double input);
+
     double convert(double from);
     double iconvert(double to);
     void convertFromFile(string fileName);
