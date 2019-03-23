@@ -22,21 +22,10 @@ public:
     int den() const { return m_denominatore; }
     void den(int denominatore) { m_denominatore = denominatore; }
 
-    Frazione& operator += (const Frazione& f) {
-        int temp_numeratore { f.m_numeratore * m_denominatore };
-        m_denominatore *= f.m_denominatore;
-        m_numeratore *= f.m_denominatore;
-        m_numeratore += temp_numeratore;
-        return *this;
-    }
-
-    Frazione& operator -= (const Frazione& f) {
-        int temp_numeratore { f.m_numeratore * m_denominatore };
-        m_denominatore *= f.m_denominatore;
-        m_numeratore *= f.m_denominatore;
-        m_numeratore -= temp_numeratore;
-        return *this;
-    }
+    Frazione& operator += (const Frazione& f);
+    Frazione& operator -= (const Frazione& f);
+    Frazione& operator *= (const Frazione& f);
+    Frazione& operator /= (const Frazione& f);
 };
 
 

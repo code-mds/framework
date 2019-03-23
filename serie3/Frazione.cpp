@@ -26,3 +26,31 @@ Frazione operator-(const Frazione& a)
 {
     return { - a.num(), a.den() };
 }
+
+Frazione &Frazione::operator+=(const Frazione &f) {
+    int temp_numeratore { f.m_numeratore * m_denominatore };
+    m_denominatore *= f.m_denominatore;
+    m_numeratore *= f.m_denominatore;
+    m_numeratore += temp_numeratore;
+    return *this;
+}
+
+Frazione &Frazione::operator-=(const Frazione &f) {
+    int temp_numeratore { f.m_numeratore * m_denominatore };
+    m_denominatore *= f.m_denominatore;
+    m_numeratore *= f.m_denominatore;
+    m_numeratore -= temp_numeratore;
+    return *this;
+}
+
+Frazione &Frazione::operator*=(const Frazione &f) {
+    m_denominatore *= f.m_numeratore;
+    m_numeratore *= f.m_denominatore;
+    return *this;
+}
+
+Frazione &Frazione::operator/=(const Frazione &f) {
+    m_denominatore *= f.m_denominatore;
+    m_numeratore *= f.m_numeratore;
+    return *this;
+}
