@@ -3,4 +3,4 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 project(TodoList)
 
-add_executable(${PROJECT_NAME} main.cpp TodoElement.cpp TodoElement.h)
+add_executable(${PROJECT_NAME} main.cpp TodoElement.cpp TodoElement.h TodoContainer.cpp TodoContainer.h)
