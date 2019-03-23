@@ -22,10 +22,12 @@ namespace s3e2 {
         }
         Gamma &operator=(const Gamma &o) {
             *m_d = *o.m_d;
+
+            return *this; //missing return
         }
 
         // remove constructor, since Gamma
-        // didn't create the double
+        // didn't allocate the double
         // so it's not responsible for the deallocation
         //~Gamma() { delete m_d; }
         void set(double *d) { m_d = d; }
@@ -33,7 +35,7 @@ namespace s3e2 {
         double *m_d{nullptr};
     };
 
-    int main() {
+    void start() {
         //2.1
         const Alpha a{7};
         std::cout << a.get() << std::endl;
