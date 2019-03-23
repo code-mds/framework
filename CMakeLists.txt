@@ -5,3 +5,4 @@ project(framework)
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/serie1" )
 add_subdirectory("${PROJECT_SOURCE_DIR}/serie2" )
+add_subdirectory("${PROJECT_SOURCE_DIR}/serie3" )
