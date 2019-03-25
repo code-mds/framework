@@ -40,6 +40,7 @@ void Convertitore::convertFromFile(string fileName) {
     while(!input.eof()) {
         if(input.fail()) {
             cerr << "error reading file" << endl;
+            input.close();
             return;
         }
 
@@ -48,12 +49,13 @@ void Convertitore::convertFromFile(string fileName) {
         cout << i << ")" << convert(val) << endl;
         i++;
     }
+    input.close();
 }
 
-double Convertitore::operator<<(const double input) {
+double Convertitore::operator<<(double input) const {
     return convert(input);
 }
 
-double Convertitore::operator>>(const double input) {
+double Convertitore::operator>>(double input) const {
     return iconvert(input);
 }

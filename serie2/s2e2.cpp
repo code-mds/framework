@@ -24,7 +24,7 @@ namespace s2e2 {
     {
         cout << "inserire tasso di cambio" << endl;
         cin >> tassoUtente;
-        if(tassoUtente <=0) {
+        if(tassoUtente <=0 || cin.fail()) {
             cout << "tasso di cambio invalido, uso default: " << tasso << endl;
             tassoUtente = tasso;
         }

@@ -18,8 +18,8 @@ public:
     Convertitore(string labelFrom, string labelTo, double rate = 1.2);
 
     friend std::ostream & operator << (std::ostream &stream, const Convertitore &conv);
-    double operator << (const double input);
-    double operator >> (const double input);
+    double operator << (double input) const;
+    double operator >> (double input) const;
 
     double convert(double from);
     double iconvert(double to);

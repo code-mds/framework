@@ -16,9 +16,9 @@ namespace s3e2 {
     };
 
     struct Gamma {
-        Gamma() {}
-        Gamma(const Gamma &o) {
-            *m_d = *o.m_d;
+        Gamma() : m_d{new double} {}
+        Gamma(const Gamma &o) : m_d{new double(*o.m_d)} {
+            //*m_d = *o.m_d;
         }
         Gamma &operator=(const Gamma &o) {
             *m_d = *o.m_d;
@@ -26,11 +26,8 @@ namespace s3e2 {
             return *this; //missing return
         }
 
-        // remove constructor, since Gamma
-        // didn't allocate the double
-        // so it's not responsible for the deallocation
-        //~Gamma() { delete m_d; }
-        void set(double *d) { m_d = d; }
+        ~Gamma() { delete m_d; }
+        void set(double *d) { *m_d = *d; }
     private:
         double *m_d{nullptr};
     };

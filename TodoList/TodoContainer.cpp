@@ -2,6 +2,7 @@
 // Created by Massimo De Santi on 2019-03-23.
 //
 
+#include <stdexcept>
 #include "TodoContainer.h"
 
 TodoElement &TodoContainer::operator[](unsigned int index) const {
