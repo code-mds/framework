@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-project(serie1)
+project(teoria)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp Alpha.cpp)

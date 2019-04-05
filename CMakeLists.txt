@@ -7,4 +7,5 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/serie1" )
 add_subdirectory("${PROJECT_SOURCE_DIR}/serie2" )
 add_subdirectory("${PROJECT_SOURCE_DIR}/serie3" )
 add_subdirectory("${PROJECT_SOURCE_DIR}/TodoList" )
-
+add_subdirectory("${PROJECT_SOURCE_DIR}/teoria" )
+add_subdirectory("${PROJECT_SOURCE_DIR}/test" )
