@@ -6,87 +6,52 @@
 
 #include "Alpha.h"
 
-/*
-
-
-:: è chiamato operatore di risoluzione dello scope
-l'overloading (sovraccarico) degli operatori (ridefinizione della loro semantica).
-operatori << >> sovraccaricati dalle classi ostream e istream
-endl e' un manipolatore, inserisce carattere nl e forza flush
-OPERATORI BINARI forme equivalenti:
-1) obj.operator<<(param);
-2) operator<<(obj, param2);
-
-Lvalue: oggetto con un nome (es. variabili) e un indirizzo di
-memoria preciso che posso ottenere con l'operatore &.
-Posso passari per riferimento
-
-Rvalue: valore temporaneo che non esiste più dopo l'espressione che lo usa
- int f(int& x) {} f(6); KO, rvalue non accettato
- int f(const int& x) {} f(6); OK, const ref
- int f(int&& x) {}  f(6); OK, rvalue ref
-
-int x = 7 + 10; // x Lvalue, (17) Rvalue
-
- In C++03, the compiler provides, for classes that do not provide them for themselves, a default constructor,
- a copy constructor, a copy assignment operator (operator=), and a destructor.
-
-
-
-
- */
-
 using namespace std; //Rende visibili i nomi definiti in questo namespace
-
+// namespace xyz = supsi::dti; // alias namespace
 
 class Collaboratore {
     string m_nome;
-    string m_istituto;
-    int m_nrcollab;
 public:
     Collaboratore() = default;
-    Collaboratore(string nome, string istituto, int nr_collab) :
-            m_nome{nome}, m_istituto{istituto}, m_nrcollab{nr_collab}
-    {
+    Collaboratore(string nome) : m_nome{nome} {
         cout << "Collaboratore Ctor" << endl;
     }
 
-
     string nome() const { return m_nome; }
-    string istituto() const { return m_istituto; }
-    int nrcollab() const { return m_nrcollab; }
-    string nomeclasse() const { return "Collaboratore"; }
-    //virtual string toString()=0; // abstract class
-    virtual string toString() { return nome() + ", " + istituto(); }
-};
-
-class Docente : public virtual Collaboratore {
-    string m_corso;
-public:
-    Docente(string nome, string istituto, int nr_collab, string corso) :
-            Collaboratore{nome, istituto, nr_collab},
-            m_corso{corso}
-    {}
-    string corso() const { return m_corso;}
-    string nomeclasse() const { return "Docente"; }
-
-    string toString() override // il compilatore controlla che esista un metodo virtual
-    { return nomeclasse() + ": " + corso(); }
-};
-
-
-class Ricercatore : public virtual Collaboratore {
-    string m_arearicerca;
-public:
-    Ricercatore(string nome, string istituto, int nr_collab, string arearicerca) :
-            Collaboratore{nome, istituto, nr_collab},
-            m_arearicerca{arearicerca}
-    {}
-    string arearicerca() const {return m_arearicerca; }
-    string nomeclasse() const { return "Ricercatore"; }
+    string classe() const { return "Collaboratore"; }
+    virtual string toString() { return nome(); }
 };
 
 // ereditarieta' multipla: uso virtual base class
+class Docente : public virtual Collaboratore {
+    string m_corso;
+public:
+    Docente(string nome, string corso) :
+            Collaboratore{nome},
+            m_corso{corso}
+    {}
+    string corso() const noexcept { return m_corso;}
+    string classe() const { return "Docente"; }
+
+    // il compilatore controlla che esista un metodo virtual
+    string toString() override { return classe() + ": " + corso(); }
+};
+
+// ereditarieta' multipla: uso virtual base class
+class Ricercatore : public virtual Collaboratore {
+    string m_arearicerca;
+public:
+    Ricercatore(string nome, string arearicerca) :
+            Collaboratore{nome},
+            m_arearicerca{arearicerca}
+    {}
+    string arearicerca() const {return m_arearicerca; }
+    string classe() const { return "Ricercatore"; }
+};
+
+// ereditarieta' multipla: uso virtual base class
+// class Ricercatore : public virtual Collaboratore ...
+// class Docente : public virtual Collaboratore ...
 // ora il compilatore usa costruttore vuoto di Collaboratore
 // invece di quello usato nella init-list di Docente e Ricercatore.
 // Quindi il costruttore vuoto va dichiarato esplicito
@@ -95,41 +60,15 @@ public:
 class DocenteRicercatore : public Docente, public Ricercatore {
     double m_percRicerca;
 public:
-    DocenteRicercatore(string nome, string istituto,
-                       int nr_collab, string corso, string arearicerca,
-                       double percRicerca) :
-            Collaboratore(nome, istituto, nr_collab),
-            Docente{nome, istituto, nr_collab, corso},
-            Ricercatore{nome, istituto, nr_collab, arearicerca},
+    DocenteRicercatore(string nome, string corso, string arearicerca, double percRicerca) :
+            Collaboratore(nome),
+            Docente{nome, corso},
+            Ricercatore{nome, arearicerca},
             m_percRicerca{percRicerca}
     {}
     double percRicerca() const { return m_percRicerca; }
-    string nomeclasse() const { return "DocenteRicercatore"; }
+    string classe() const { return "DocenteRicercatore"; }
 };
-
-
-enum class Sesso { Maschio, Femmina }; // strongly typed, non convertito in num
-struct Persona { string nome; }; //typedef non necessario
-
-void testCast();
-
-void testAuto();
-
-void ordineCostrDestr();
-
-void binding();
-
-int moltiplica(int a, int b) noexcept { return a * b; }
-namespace supsi {
-    namespace dti {
-        int moltiplica(int a, int b) { return ::moltiplica(a, b); }
-}}
-
-void swap(int& x, int& y) {
-    int temp{x};
-    x = y;
-    y = temp;
-}
 
 /*
 int& sbagliato(int& x, int& y) {
@@ -137,59 +76,117 @@ int& sbagliato(int& x, int& y) {
     return temp; // Attenzione! Ritorno un rif. a una variabile locale!!!!
 }*/
 
-namespace xyz = supsi::dti; // alias namespace
 
+/*
+Rvalue: valore temporaneo (non hanno nome) che non esiste più dopo l'espressione che lo usa
+ int f(int& x) {} f(6); KO, rvalue non accettato
+ int f(const int& x) {} f(6); OK, const ref
+ int f(int&& x) {}  f(6); OK, rvalue ref
+*/
+
+class F {
+public:
+    F(int n=0, int d=1) : m_num{n}, m_den{d} {}
+
+    int num() const { return m_num; } //getter
+    void num(int n) { m_num = n; } //setter
+    int den() const { return m_den; }
+    void den(int d) { m_den = d; }
+
+    F& operator += (const F& f){
+        int temp_numeratore { f.m_num * m_den };
+        m_den *= f.m_den;
+        m_num *= f.m_den;
+        m_num += temp_numeratore;
+        return *this;
+    };
+    F& operator -= (const F& f){
+        int temp_numeratore { f.m_num * m_den };
+        m_den *= f.m_den;
+        m_num *= f.m_den;
+        m_num -= temp_numeratore;
+        return *this;
+    };
+    // conversion/cast operator: F f{3,4}; double a=f;
+    operator double() { return double(m_num) / m_den; }
+    // prefix   ++f
+    F& operator ++() { return *this += 1; }
+    // postfix   f++ (inserisco un parametro fittizio)
+    F operator ++(int) {
+        F old{*this};
+        *this += 1;
+        return old;
+    }
+
+private:
+    int m_num, m_den;
+};
+
+// f1 copy, f2 reference. return a copy
+F operator + (F f1, const F& f2) {
+    return f1 += f2;
+};
+
+// bitshift operator (binario), overload da ostream
+// es. o << f; o.operator<<(f); operator<<(o, f);
+// endl manipolatore, inserisce carattere nl e forza flush
+ostream& operator << (ostream& o, const F& f) {
+    o << f.num() << "/" << f.den() << endl;
+    return o;
+};
+
+// il compilatore automaticamente crea:
+//  default ctor (se altri costruttori non esplicitati)
+//  copy ctor, copy assignment (operator=), destructor (non ereditati)
 struct A {
-    A() { cout << "create A" << endl; }
-    ~A() { cout << "destr A" << endl; }
-    string foo() { return "A.foo() "; }
-//    VISIBILITA:
-//      Un metodo con lo stesso nome di un metodo di una classe
-//      base nasconde tutte le funzioni sovraccaricate con lo stesso
-//      nome nella classe base
-    string p(int v) { return "A.p(int) "; }
-    string p() { return "A.p() "; }
-
+    A() : m_num{-1} { cout << "A()" << endl; }
+    // explicit: evita implicit conversion
+    explicit A(int val) : m_num{val} { cout << "A(int)" << endl; }
+    virtual ~A() { cout << "~A()" << endl; }
     virtual string f() { return "A.f() "; }
+    string g() { return "A.g() "; }
+    string h() { return "A.h() "; }
+    string h(int v) { return "A.h(int) "; } //overloading di h()
+private:
+    int m_num;
 };
 
 struct B : A {
-    B() { cout << "create B" << endl; }
-    ~B() { cout << "destr B" << endl; }
+    B() { cout << "B()" << endl; }
+    B(string str) : A{10}, m_str{"default"} { cout << "B(str)"; }
+    virtual ~B() { cout << "~B()" << endl; }
 
-    string p(string f) { return "B.p(str) "; }
+    string f() override final { return "B.f() "; } // final method
+    string g() { return "B.g() "; } // HIDING: perche' A::g() non virtual
+    string h(string str) { m_str = str; return "B.h(str) "; }
 
-    string foo() { return "B.foo() "; }
-    string f() final { return "B.f() "; }
+    // HIDING: metodo con stesso nome definito in classe base
+    // nasconde tutte i metodi sovraccaricati nella classe base
+    // :: è chiamato operatore di risoluzione dello scope
+    using A::h; // fix hiding, ora tutti gli h sono visibili
+    // alternativa client chiama esplicit b.A::h(12)
 
-    using A::p;  // risolvo problema di HIDING, alternativa  b.A::p(12)
-
-//    funzioni mai ereditate, hanno bisogno info su oggetto
-//    – I costruttori di copia
-//    – Gli operatori di assegnamento di copia
-//    – I distruttori
+private:
+    string m_str;
 };
 
-// B e' final: impedisce ulteriori derivazioni
+// C e' final: impedisce ulteriori derivazioni
 struct C final : B {
     // ctor with initializer_list HA PRECEDENZA
     C(const std::initializer_list<int>& valori) {
-        cout << "C ctor init_list" << endl;
-        for (const auto& v : valori) {
-            m_vect.push_back(v);
-        }
+        cout << "C(init_list) " << endl;
+        for (const auto& v : valori) { m_vect.push_back(v); }
     }
 
-    C(int sz) {
-        cout << "C ctor int" << endl;
-        m_vect.reserve(sz); }
+    explicit C(int sz) {
+        cout << "C(int)" << endl;
+        m_vect.reserve(sz);
+    }
 
     //string f() {} non posso piu' fare override perche' f e' final in B
 
     void print() {
-        for (const auto& x : m_vect) {
-            cout << x;
-        }
+        for (const auto& x : m_vect) { cout << x; }
         cout << endl;
     }
     void removeAt(int pos) {
@@ -204,6 +201,14 @@ struct C final : B {
 private:
     vector<int> m_vect;
 };
+
+
+
+
+
+
+
+
 
 
 void test_std() {
@@ -245,9 +250,9 @@ void binding() {
     // vtable all'interno della classe (condivisa tra tutti gli oggetti)
     A a; B b;
     A& ab{b};
-    cout << "a " << a.foo() << a.f() << a.p() << a.p(12) << endl;
-    cout << "b " << b.foo() << b.f() << b.A::f() << b.p() << b.p("c") << endl;
-    cout << "ab " << ab.foo() << ab.f() << endl;
+    cout << "a " << a.g() << a.f() << a.h() << a.h(12) << endl;
+    cout << "b " << b.g() << b.f() << b.A::f() << b.h() << b.h("c") << endl;
+    cout << "ab " << ab.g() << ab.f() << endl;
 }
 
 void ordineCostrDestr() {
@@ -279,10 +284,10 @@ void testAuto() {
 //    mystr.erase(3,6);
 //    mystr.replace(0, 5, "Hello");
 //    size_t pos = mystr.find("mondo", 0);
-    int pi_a = 3.14; // Diventa 3!
+//    int pi_a = 3.14; // Diventa 3!
 //   int pi_b {3.14}; // Problema!
     auto r{1.2}; // compilatore cambia auto in double
-    auto k{moltiplica(4,2)}; // compilatore cambia auto in int
+//    auto k{moltiplica(4,2)}; // compilatore cambia auto in int
 
     int mioarray[] { 1, 5, 3, 6, 2};
     for (auto i : mioarray) cout << i << endl;
@@ -312,11 +317,11 @@ void testAuto() {
 }
 
 void testCast() {
-    DocenteRicercatore dr{"Massimo", "SUPSI", 123, "DTI", "MED", 12.3};
+    DocenteRicercatore dr{"Massimo", "DTI", "MED", 12.3};
     cout << dr.nome() << endl;
     cout << typeid(dr).name() << endl; // 18DocenteRicercatore
 
-    Docente doc{"Giovanni", "ISIN", 42, "Linguaggi e framework"};
+    Docente doc{"Giovanni", "Linguaggi"};
     cout << typeid(doc).name() << endl; // 7Docente
 
     // static_cast<tipo>(oggetto), check durante compilazione
@@ -390,9 +395,9 @@ void smart_pointers() {
 
         vector<unique_ptr<int>> v;
         unique_ptr<int> p {new int{13}};
-        //v.push_back(p); // Errore! Non posso fare una copia
+        //v.push_back(h); // Errore! Non posso fare una copia
         v.push_back(move(p)); // Ok! Trasferisco l'ownership
-        //cout << *p << endl; // Errore a runtime!!!! p non è più mio!
+        //cout << *h << endl; // Errore a runtime!!!! h non è più mio!
 
         unique_ptr<int> p3{allocaArray()};
         cout << *p3 << endl;  // posso dereferenziare come un puntatore normale
