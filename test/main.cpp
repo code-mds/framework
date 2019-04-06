@@ -1,3 +1,10 @@
+#include <memory>
+#include <iostream> // std:: cin, cout, cerr, endl
+#include <string>
+#include <sstream>
+#include <vector>
+
+#include "Alpha.h"
 
 /*
 
@@ -28,9 +35,6 @@ int x = 7 + 10; // x Lvalue, (17) Rvalue
 
 
  */
-#include <iostream> // std:: cin, cout, cerr, endl
-#include <string>
-#include "Alpha.h"
 
 using namespace std; //Rende visibili i nomi definiti in questo namespace
 
@@ -148,6 +152,7 @@ struct A {
 
     virtual string f() { return "A.f() "; }
 };
+
 struct B : A {
     B() { cout << "create B" << endl; }
     ~B() { cout << "destr B" << endl; }
@@ -155,17 +160,83 @@ struct B : A {
     string p(string f) { return "B.p(str) "; }
 
     string foo() { return "B.foo() "; }
-    string f() { return "B.f() "; }
+    string f() final { return "B.f() "; }
+
+    using A::p;  // risolvo problema di HIDING, alternativa  b.A::p(12)
+
+//    funzioni mai ereditate, hanno bisogno info su oggetto
+//    – I costruttori di copia
+//    – Gli operatori di assegnamento di copia
+//    – I distruttori
+};
+
+// B e' final: impedisce ulteriori derivazioni
+struct C final : B {
+    // ctor with initializer_list HA PRECEDENZA
+    C(const std::initializer_list<int>& valori) {
+        cout << "C ctor init_list" << endl;
+        for (const auto& v : valori) {
+            m_vect.push_back(v);
+        }
+    }
+
+    C(int sz) {
+        cout << "C ctor int" << endl;
+        m_vect.reserve(sz); }
+
+    //string f() {} non posso piu' fare override perche' f e' final in B
+
+    void print() {
+        for (const auto& x : m_vect) {
+            cout << x;
+        }
+        cout << endl;
+    }
+    void removeAt(int pos) {
+        m_vect.erase(m_vect.begin() + pos);
+    }
+    void append(int v) {
+        m_vect.push_back(v);
+    }
+    int size() {
+        return m_vect.size();
+    }
+private:
+    vector<int> m_vect;
 };
 
 
-int main() {
-    binding();
+void test_std() {
+    // String Stream
+    stringstream sstr;
+    for (int i=0; i<10; i++) {
+        sstr << i;
+    }
+    cout << sstr.str() << endl;
 
-//    ordineCostrDestr();
-//    testAuto();
-//    testCast();
+    // vector, map, list
+    C c2(1); // per forzare uso di costruttore con int
+    C c{1,2,3,4,5,6};
+    c.removeAt(3); // 0 based
+    c.append(8);
+    c.print();     // 123568
+
+    // list
+//    l1.push_back(5);
+//    l1.push_front(5);
+//    l1.pop_back();
+//    l1.pop_front();
+
+//    map<string,int> contatti { {"Pinco", 123456},
+//                               {"Pallino", 2342342}};
+//    contatti ["Alfonso"] = 32333;
+//    if (contatti.count("Pinco") == 1) {
+//        cout << "Pinco esiste" << endl;
+//    }
+//    contatti.erase ("Pallino");
 }
+
+
 
 void binding() {
     // statico: compile time, non permette polimorfismo. ma piu' efficiente
@@ -175,32 +246,22 @@ void binding() {
     A a; B b;
     A& ab{b};
     cout << "a " << a.foo() << a.f() << a.p() << a.p(12) << endl;
-    // HIDING: b.p() e b.(12) non disponibili
-    cout << "b " << b.foo() << b.f() << b.A::f() << b.A::p() << b.A::p(12) << b.p("c") << endl;
+    cout << "b " << b.foo() << b.f() << b.A::f() << b.p() << b.p("c") << endl;
     cout << "ab " << ab.foo() << ab.f() << endl;
 }
 
 void ordineCostrDestr() {
-//        A <- B <- C
+//        A <- B
 //        DERIVAZIONE: protected: i metodi public diventano protected, protected rimangono protected
 //        quando istanzio un oggetto di tipo B prima di tutto creo un oggetto A
 //        se nella init-list non chiamo esplicitamente un ctor di A, viene cercato il default cto()
 //        se non esiste non compila. I ctor classi basi sono chiamati prima di ctor derivate
 
-//        ## A a
-//        create A
-//        ## B b
-//        create A
-//        create B
-//        ## end scope
-//        destr B
-//        destr A
-//        destr A
-
-        cout << "## A a" << endl;
-        A a;
-        cout << "## B b" << endl;
-        B b;
+//        ## A a -> create A
+//        ## B b -> create A, create B
+//        ## end scope -> destr B, destr A, destr A
+        cout << "## A a" << endl; A a;
+        cout << "## B b" << endl; B b;
         cout << "## end scope" << endl;
     }
 
@@ -308,7 +369,61 @@ void testCast() {
     // operatore typeid permette di determinare la classe di
 //un oggetto a runtime
 
+}
 
+unique_ptr<int> allocaArray()
+{
+    // alloco un int array sull'heap
+    return unique_ptr<int>{new int{13}};
+}
 
+void smart_pointers() {
+    // #include <memory>
+    // memoria viene liberata automaticamente fuori dallo scope, chiamata a distruttore
+    // get()     ottengo il puntatore
+    // release() rilascio l'ownership
+
+    // unique_ptr, unique ownership. non puo' essere copiato. devo usare reference
+    {
+        unique_ptr<int> p1{new int}; // alloco un int sull'heap
+        unique_ptr<int>& r {p1};
+
+        vector<unique_ptr<int>> v;
+        unique_ptr<int> p {new int{13}};
+        //v.push_back(p); // Errore! Non posso fare una copia
+        v.push_back(move(p)); // Ok! Trasferisco l'ownership
+        //cout << *p << endl; // Errore a runtime!!!! p non è più mio!
+
+        unique_ptr<int> p3{allocaArray()};
+        cout << *p3 << endl;  // posso dereferenziare come un puntatore normale
+    }
+
+    // smart_ptr, shared ownership. supportano la copia
+    // quando l'ultima copia viene distrutta anche il puntatore viene distrutto
+    {
+        shared_ptr<int> p {new int{13}};
+        shared_ptr<int> t = make_shared<int>(17);
+        shared_ptr<int> r {p}; // Ok! Creo una copia
+    }
+}
+
+void eccezioni() {
+    //#include <stdexcept>
+    // stack unwinding, distruzione di oggetti che escono da scope
+    // parola chiave noexcept per marcare metodi che impediscono all'eccezione di propagarsi oltre
+    // non esiste finally
+    // throw out_of_range("errore")
+    // throw 12; throw "ciao"; posso fare il throw con qualsiasi tipo
+    // throw; rilancio l'eccezione
+}
+
+int main() {
+    eccezioni();
+    smart_pointers();
+//    test_std();
+//    binding();
+//    ordineCostrDestr();
+//    testAuto();
+//    testCast();
 }
 
