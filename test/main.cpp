@@ -12,7 +12,7 @@ using namespace std; //Rende visibili i nomi definiti in questo namespace
 class Collaboratore {
     string m_nome;
 public:
-    Collaboratore() = default;
+    //Collaboratore() = default;
     Collaboratore(string nome) : m_nome{nome} {
         cout << "Collaboratore Ctor" << endl;
     }
@@ -98,13 +98,6 @@ public:
         m_den *= f.m_den;
         m_num *= f.m_den;
         m_num += temp_numeratore;
-        return *this;
-    };
-    F& operator -= (const F& f){
-        int temp_numeratore { f.m_num * m_den };
-        m_den *= f.m_den;
-        m_num *= f.m_den;
-        m_num -= temp_numeratore;
         return *this;
     };
     // conversion/cast operator: F f{3,4}; double a=f;
@@ -195,7 +188,7 @@ struct C final : B {
     void append(int v) {
         m_vect.push_back(v);
     }
-    int size() {
+    unsigned long size() {
         return m_vect.size();
     }
 private:
@@ -271,7 +264,7 @@ void ordineCostrDestr() {
     }
 
 void testAuto() {
-    cout << supsi::dti::moltiplica(3, 2) << endl;
+//    cout << supsi::dti::moltiplica(3, 2) << endl;
     string msg{"Ciao mondo!"};
 // string str('x'); // Errore
 //    cout << msg << endl << msg.length() << endl << msg.empty() << endl;
@@ -310,7 +303,7 @@ void testAuto() {
     // Riferimento a un intero (alias per a)
 // A differenza di un puntatore, un riferimento non
 //può essere modificato per “puntare” a qualcos'altro (e magari a niente!)
-    int& c{pi_a}; //
+//    int& c{pi_a}; //
 
     // modificare un array
     for (auto& i : mioarray) i++;
@@ -422,13 +415,66 @@ void eccezioni() {
     // throw; rilancio l'eccezione
 }
 
+class Bravo {
+public:
+    Bravo() {};
+    void x(double v) { m_x = v; }
+private:
+    double m_x{3.14};
+};
+
+void test2_3() {
+    Bravo b, c;
+    b.x(1.6);
+    c = b;
+//    cout << c.m_x << endl;
+//    cout << b.m_x << endl;
+}
+
+
+struct Value {
+    Value(int x=0) : m_x{x} {};
+    int x() const { return m_x; }
+private:
+    int m_x;
+};
+
+void test_2_1() {
+    const Value v1{1};
+    cout << v1.x() << endl;
+    Value v2;
+    v2 = 5;
+    cout << v2.x() << endl;
+}
+
+struct Charlie {
+    void foo() {
+        m_a++;
+    }
+    void bar() {
+        m_a--;
+    }
+    int m_a{0};
+};
+
+void test_2_2() {
+    Charlie c,b;
+    c.foo();
+    cout << c.m_a << endl;
+    b = c;
+    b.bar();
+    cout << c.m_a << endl;
+}
+
 int main() {
-    eccezioni();
-    smart_pointers();
+//    eccezioni();
+//    smart_pointers();
 //    test_std();
 //    binding();
 //    ordineCostrDestr();
 //    testAuto();
 //    testCast();
+//    test_2_1();
+//    test2_3();
+    test_2_2();
 }
-
