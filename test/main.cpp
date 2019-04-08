@@ -466,6 +466,28 @@ void test_2_2() {
     cout << c.m_a << endl;
 }
 
+struct Gamma {
+    Gamma() : m_d{new double{0}} {}
+    Gamma(const Gamma& o) : m_d{new double{*o.m_d}} {}
+    Gamma& operator=(const Gamma& o) {
+        *m_d = *o.m_d;
+        return *this;
+    }
+
+    virtual ~Gamma() { delete m_d; }
+    void set(double* v) { *m_d = *v; }
+
+    double* m_d{nullptr};
+};
+
+void test_3_3() {
+    double pi{3.14}, e{2.62};
+    Gamma g,h;
+    g.set(&pi);
+    h.set(&e);
+    g=h;
+}
+
 int main() {
 //    eccezioni();
 //    smart_pointers();
@@ -476,5 +498,6 @@ int main() {
 //    testCast();
 //    test_2_1();
 //    test2_3();
-    test_2_2();
+//    test_2_2();
+test_3_3();
 }
