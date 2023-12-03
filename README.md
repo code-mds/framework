@@ -1,5 +1,5 @@
-# framework
-SUPSI - Esercizi su C++ e Qt framework
+# SUPSI - Qt framework
+Esercizi su C++ e Qt framework
 
 * Serie 1: Introduzione C++
 * Serie 2/3: Classi
